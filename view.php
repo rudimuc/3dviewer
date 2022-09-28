@@ -42,7 +42,7 @@
         // Camera setup
         const fov = 30;
         const near = 0.04;
-        const far = 2000;
+        const far = 30000;
 
         camera = new THREE.PerspectiveCamera(fov, width / height, near, far);
         camera.position.set(0,0,10);
@@ -106,7 +106,20 @@
 
         new GLTFLoader(  )
             .load(modelpath, function ( gltf ) {
+                var model = gltf.scene;
+                model.traverse((o) => {
+                    if (o.isMesh) {
+                       // var newMaterial = new THREE.MeshStandardMaterial({flatShading: true, map: o.material.map, roughness: 2,toneMapped : false,color: 0xffffff});
+
+                        //o.material = newMaterial;
+
+                        var box = new THREE.Box3().setFromObject( o );
+                        controls.target.set((box.max.x + box.min.x)/2, (box.max.y + box.min.y)/2, (box.max.z + box.min.z)/2);
+                    }
+                });
+
                 scene.add( gltf.scene );
+
                 render();
             } , function(request) {
                 progressBar.value = 100*(request.loaded/request.total);
